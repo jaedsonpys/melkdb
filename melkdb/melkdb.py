@@ -36,31 +36,47 @@ class MelkDB:
 
         return os.path.join(base_path, klen, first_letter, last_letter)
 
-    def add(self, key: str, value: str) -> None:
-        klen = str(len(key))
-        first_letter = key[0]
-        last_letter = key[-1]
+    def add(self, path: str, value: str) -> None:
+        key_list = path.split('/')
+        prev_path = None
 
-        first_box_path = os.path.join(self._db_path, klen)
+        for key in key_list:
+            klen = str(len(key))
+            first_letter = key[0]
+            last_letter = key[-1]
 
-        if not os.path.isdir(first_box_path):
-            os.mkdir(first_box_path)
+            base_path = self._db_path
 
-        second_box_path = os.path.join(first_box_path, first_letter)
+            if prev_path:
+                base_path = prev_path
 
-        if not os.path.isdir(second_box_path):
-            os.mkdir(second_box_path)
+            first_box_path = os.path.join(base_path, klen)
 
-        third_box_path = os.path.join(second_box_path, last_letter)
+            if not os.path.isdir(first_box_path):
+                os.mkdir(first_box_path)
 
-        if not os.path.isdir(third_box_path):
-            os.mkdir(third_box_path)
+            second_box_path = os.path.join(first_box_path, first_letter)
+
+            if not os.path.isdir(second_box_path):
+                os.mkdir(second_box_path)
+
+            third_box_path = os.path.join(second_box_path, last_letter)
+            prev_path = third_box_path
+
+            if not os.path.isdir(third_box_path):
+                os.mkdir(third_box_path)
 
         data_path = os.path.join(third_box_path, 'data.melkdb')
-        item = self._create_item(value)
 
-        with open(data_path, 'wb') as f:
-            f.write(item)
+        if isinstance(value, dict):
+            for k, v in value.items():
+                new_path = '/'.join((path, k))
+                self.add(new_path, v)
+        else:
+            item = self._create_item(value)
+
+            with open(data_path, 'wb') as f:
+                f.write(item)
 
     def get(self, key: str) -> Union[None, str]:
         key_path = self._map_key(key)
