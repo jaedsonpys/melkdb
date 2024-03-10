@@ -53,42 +53,47 @@ class MelkDB:
 
         return os.path.join(base_path, klen, first_letter, last_letter)
 
+    def _prepare_block(self, key: str,
+                       previous_key: Union[None, str] = None) -> str:
+        klen = str(len(key))
+        first_letter = key[0]
+        last_letter = key[-1]
+
+        base_path = self._db_path
+
+        if previous_key:
+            base_path = previous_key
+
+        first_box_path = os.path.join(base_path, klen)
+
+        if not os.path.isdir(first_box_path):
+            os.mkdir(first_box_path)
+
+        second_box_path = os.path.join(first_box_path, first_letter)
+
+        if not os.path.isdir(second_box_path):
+            os.mkdir(second_box_path)
+
+        third_box_path = os.path.join(second_box_path, last_letter)
+
+        if not os.path.isdir(third_box_path):
+            os.mkdir(third_box_path)
+
+        return third_box_path
+
     def add(self, path: str, value: Union[dict, str, int, float, bool]) -> None:
         key_list = path.split('/')
         prev_path = None
 
         for key in key_list:
-            klen = str(len(key))
-            first_letter = key[0]
-            last_letter = key[-1]
-
-            base_path = self._db_path
-
-            if prev_path:
-                base_path = prev_path
-
-            first_box_path = os.path.join(base_path, klen)
-
-            if not os.path.isdir(first_box_path):
-                os.mkdir(first_box_path)
-
-            second_box_path = os.path.join(first_box_path, first_letter)
-
-            if not os.path.isdir(second_box_path):
-                os.mkdir(second_box_path)
-
-            third_box_path = os.path.join(second_box_path, last_letter)
-            prev_path = third_box_path
-
-            if not os.path.isdir(third_box_path):
-                os.mkdir(third_box_path)
+            prev_path = self._prepare_block(key, prev_path)
 
         if isinstance(value, dict):
             for k, v in value.items():
                 new_path = '/'.join((path, k))
                 self.add(new_path, v)
         else:
-            data_path = os.path.join(third_box_path, 'data.melkdb')
+            data_path = os.path.join(prev_path, 'data.melkdb')
             item = self._create_item(value)
 
             with open(data_path, 'wb') as f:
