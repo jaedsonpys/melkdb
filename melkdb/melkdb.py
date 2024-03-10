@@ -1,4 +1,6 @@
 import os
+import struct
+
 from pathlib import Path
 
 HOME_PATH = Path().home()
@@ -14,3 +16,11 @@ class MelkDB:
         
         if not os.path.isdir(self._db_path):
             os.mkdir(self._db_path)
+
+        print(self._create_item('Jaedson'))
+
+    @staticmethod
+    def _create_item(value: str) -> bytes:
+        vlen = len(value)
+        item = struct.pack(f'h {vlen}s', vlen, value.encode())
+        return item
