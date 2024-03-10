@@ -1,6 +1,7 @@
 import os
 import struct
 
+from typing import Union
 from pathlib import Path
 
 HOME_PATH = Path().home()
@@ -22,6 +23,18 @@ class MelkDB:
         vlen = len(value)
         item = struct.pack(f'h {vlen}s', vlen, value.encode())
         return item
+
+    def _map_key(self, key: str, previous_path: Union[str, None] = None) -> str:
+        klen = str(len(key))
+        first_letter = key[0]
+        last_letter = key[-1]
+
+        base_path = self._db_path
+
+        if previous_path:
+            base_path = previous_path
+
+        return os.path.join(base_path, klen, first_letter, last_letter)
 
     def add(self, key: str, value: str) -> None:
         klen = str(len(key))
