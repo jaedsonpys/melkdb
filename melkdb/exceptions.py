@@ -6,3 +6,8 @@ class ValueNotSupportedError(Exception):
 class KeyIsNotAStringError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+
+class IncompatibleDatabaseError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

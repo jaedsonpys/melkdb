@@ -1,10 +1,12 @@
 import os
+import json
 import struct
 
 from typing import Union
 from pathlib import Path
 
 from .exceptions import *
+from .__init__ import __version__
 
 HOME_PATH = Path().home()
 MELKDB_STORAGE_PATH = os.path.join(HOME_PATH, '.melkdb.databases')
@@ -20,9 +22,26 @@ if not os.path.isdir(MELKDB_STORAGE_PATH):
 class MelkDB:
     def __init__(self, name: str):
         self._db_path = os.path.join(MELKDB_STORAGE_PATH, name)
+        db_config_path = os.path.join(self._db_path, 'config.json')
         
         if not os.path.isdir(self._db_path):
             os.mkdir(self._db_path)
+
+            with open(db_config_path, 'w') as f:
+                json.dump({'version': __version__}, f)
+        else:
+            with open(db_config_path, 'rb') as f:
+                config = json.load(f)
+
+            db_version = config['version']
+
+            current_major_v = __version__.split('.')[0]
+            db_major_v = db_version.split('.')[0]
+
+            if current_major_v != db_major_v:
+                raise IncompatibleDatabaseError(f'Database created with {db_major_v}.x.x'
+                                                 'MelkDB version')
+
 
     @staticmethod
     def _create_item(value: Union[str, int, float, bool]) -> bytes:
