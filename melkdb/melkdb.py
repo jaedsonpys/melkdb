@@ -66,13 +66,12 @@ class MelkDB:
             if not os.path.isdir(third_box_path):
                 os.mkdir(third_box_path)
 
-        data_path = os.path.join(third_box_path, 'data.melkdb')
-
         if isinstance(value, dict):
             for k, v in value.items():
                 new_path = '/'.join((path, k))
                 self.add(new_path, v)
         else:
+            data_path = os.path.join(third_box_path, 'data.melkdb')
             item = self._create_item(value)
 
             with open(data_path, 'wb') as f:
