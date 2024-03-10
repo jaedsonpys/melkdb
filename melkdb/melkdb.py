@@ -77,13 +77,23 @@ class MelkDB:
             with open(data_path, 'wb') as f:
                 f.write(item)
 
-    def get(self, key: str) -> Union[None, str]:
-        key_path = self._map_key(key)
-        data_file_path = os.path.join(key_path, 'data.melkdb')
+    def get(self, path: str) -> Union[None, str]:
+        key_list = path.split('/')
+        prev_path = None
+
+        for key in key_list:
+            if prev_path:
+                key_path = self._map_key(key, previous_path=prev_path)
+            else:
+                key_path = self._map_key(key)
+
+            prev_path = key_path
+        
+        data_file_path = os.path.join(prev_path, 'data.melkdb')
 
         if not os.path.isfile(data_file_path):
             return None
-        
+
         with open(data_file_path, 'rb') as f:
             vlen, = struct.unpack('h', f.read(2))
             value, = struct.unpack(f'{vlen}s', f.read(vlen))
