@@ -119,7 +119,7 @@ class MelkDB:
                 new_path = '/'.join((path, k))
                 self.add(new_path, v)
         else:
-            data_path = os.path.join(prev_path, 'data.melkdb')
+            data_path = os.path.join(prev_path, key_list[-1])
             item = self._create_item(value)
 
             with open(data_path, 'wb') as f:
@@ -140,7 +140,7 @@ class MelkDB:
 
             prev_path = key_path
         
-        data_file_path = os.path.join(prev_path, 'data.melkdb')
+        data_file_path = os.path.join(prev_path, key_list[-1])
 
         if not os.path.isfile(data_file_path):
             return None
