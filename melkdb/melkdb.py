@@ -4,6 +4,8 @@ import struct
 from typing import Union
 from pathlib import Path
 
+from .exceptions import *
+
 HOME_PATH = Path().home()
 MELKDB_STORAGE_PATH = os.path.join(HOME_PATH, '.melkdb.databases')
 
@@ -37,6 +39,8 @@ class MelkDB:
         elif isinstance(value, bool):
             vlen = BOOL_TYPE
             pack_fmt = '?'
+        else:
+            raise ValueNotSupportedError(f'type {type(value)} is not supported')
 
         item = struct.pack(f'<h{pack_fmt}', vlen, value)
         return item
