@@ -61,3 +61,16 @@ class MelkDB:
 
         with open(data_path, 'wb') as f:
             f.write(item)
+
+    def get(self, key: str) -> Union[None, str]:
+        key_path = self._map_key(key)
+        data_file_path = os.path.join(key_path, 'data.melkdb')
+
+        if not os.path.isfile(data_file_path):
+            return None
+        
+        with open(data_file_path, 'rb') as f:
+            vlen, = struct.unpack('h', f.read(2))
+            value, = struct.unpack(f'{vlen}s', f.read(vlen))
+
+        return value.decode()
