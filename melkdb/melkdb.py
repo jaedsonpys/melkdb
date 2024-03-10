@@ -7,6 +7,10 @@ from pathlib import Path
 HOME_PATH = Path().home()
 MELKDB_STORAGE_PATH = os.path.join(HOME_PATH, '.melkdb.databases')
 
+INT_TYPE = -1
+FLOAT_TYPE = -2
+BOOL_TYPE = -3
+
 if not os.path.isdir(MELKDB_STORAGE_PATH):
     os.mkdir(MELKDB_STORAGE_PATH)
 
@@ -19,9 +23,22 @@ class MelkDB:
             os.mkdir(self._db_path)
 
     @staticmethod
-    def _create_item(value: str) -> bytes:
-        vlen = len(value)
-        item = struct.pack(f'h {vlen}s', vlen, value.encode())
+    def _create_item(value: Union[str, int, float, bool]) -> bytes:
+        if isinstance(value, str):
+            vlen = len(value)
+            pack_fmt = f'{vlen}s'
+            value = value.encode()
+        elif isinstance(value, int):
+            vlen = INT_TYPE
+            pack_fmt = 'i'
+        elif isinstance(value, float):
+            vlen = FLOAT_TYPE
+            pack_fmt = 'f'
+        elif isinstance(value, bool):
+            vlen = BOOL_TYPE
+            pack_fmt = '?'
+
+        item = struct.pack(f'<h{pack_fmt}', vlen, value)
         return item
 
     def _map_key(self, key: str, previous_path: Union[str, None] = None) -> str:
@@ -36,7 +53,7 @@ class MelkDB:
 
         return os.path.join(base_path, klen, first_letter, last_letter)
 
-    def add(self, path: str, value: str) -> None:
+    def add(self, path: str, value: Union[dict, str, int, float, bool]) -> None:
         key_list = path.split('/')
         prev_path = None
 
@@ -96,6 +113,23 @@ class MelkDB:
 
         with open(data_file_path, 'rb') as f:
             vlen, = struct.unpack('h', f.read(2))
-            value, = struct.unpack(f'{vlen}s', f.read(vlen))
 
-        return value.decode()
+            if vlen == INT_TYPE:
+                fmt = 'i'
+                rsize = 4
+            elif vlen == FLOAT_TYPE:
+                fmt = 'f'
+                rsize = 4
+            elif vlen == BOOL_TYPE:
+                fmt = '?'
+                rsize = 1
+            else:
+                fmt = f'{vlen}s'
+                rsize = vlen
+
+            value, = struct.unpack(f'<{fmt}', f.read(rsize))
+
+            if isinstance(value, bytes):
+                value = value.decode()
+
+        return value
