@@ -86,6 +86,9 @@ class MelkDB:
         return third_box_path
 
     def add(self, path: str, value: Union[dict, str, int, float, bool]) -> None:
+        if not isinstance(path, str):
+            raise KeyIsNotAStringError('The path must be a string')
+
         key_list = path.split('/')
         prev_path = None
 
@@ -104,6 +107,9 @@ class MelkDB:
                 f.write(item)
 
     def get(self, path: str) -> Union[None, str]:
+        if not isinstance(path, str):
+            raise KeyIsNotAStringError('The path must be a string')
+
         key_list = path.split('/')
         prev_path = None
 
