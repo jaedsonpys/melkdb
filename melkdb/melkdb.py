@@ -139,31 +139,29 @@ class MelkDB:
                 key_path = self._map_key(key)
 
             prev_path = key_path
-        
+
         data_file_path = os.path.join(prev_path, key_list[-1])
 
-        if not os.path.isfile(data_file_path):
-            return None
+        if os.path.isfile(data_file_path):
+            with open(data_file_path, 'rb') as f:
+                vlen, = struct.unpack('h', f.read(2))
 
-        with open(data_file_path, 'rb') as f:
-            vlen, = struct.unpack('h', f.read(2))
+                if vlen == INT_TYPE:
+                    fmt = 'i'
+                    rsize = 4
+                elif vlen == FLOAT_TYPE:
+                    fmt = 'f'
+                    rsize = 4
+                elif vlen == BOOL_TYPE:
+                    fmt = '?'
+                    rsize = 1
+                else:
+                    fmt = f'{vlen}s'
+                    rsize = vlen
 
-            if vlen == INT_TYPE:
-                fmt = 'i'
-                rsize = 4
-            elif vlen == FLOAT_TYPE:
-                fmt = 'f'
-                rsize = 4
-            elif vlen == BOOL_TYPE:
-                fmt = '?'
-                rsize = 1
-            else:
-                fmt = f'{vlen}s'
-                rsize = vlen
+                value, = struct.unpack(f'<{fmt}', f.read(rsize))
 
-            value, = struct.unpack(f'<{fmt}', f.read(rsize))
+                if isinstance(value, bytes):
+                    value = value.decode()
 
-            if isinstance(value, bytes):
-                value = value.decode()
-
-        return value
+            return value
