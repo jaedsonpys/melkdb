@@ -64,30 +64,18 @@ class MelkDB:
         item = struct.pack(f'<h{pack_fmt}', vlen, value)
         return item
 
-    def _map_key(self, key: str, previous_path: Union[str, None] = None) -> str:
+    def _map_key(self, key: str) -> str:
+        klen = str(len(key))
+        first_letter = key[0]
+        last_letter = key[-1]
+        return os.path.join(self._db_path, klen, first_letter, last_letter)
+
+    def _prepare_block(self, key: str) -> str:
         klen = str(len(key))
         first_letter = key[0]
         last_letter = key[-1]
 
-        base_path = self._db_path
-
-        if previous_path:
-            base_path = previous_path
-
-        return os.path.join(base_path, klen, first_letter, last_letter)
-
-    def _prepare_block(self, key: str,
-                       previous_key: Union[None, str] = None) -> str:
-        klen = str(len(key))
-        first_letter = key[0]
-        last_letter = key[-1]
-
-        base_path = self._db_path
-
-        if previous_key:
-            base_path = previous_key
-
-        first_box_path = os.path.join(base_path, klen)
+        first_box_path = os.path.join(self._db_path, klen)
 
         if not os.path.isdir(first_box_path):
             os.mkdir(first_box_path)
@@ -104,43 +92,26 @@ class MelkDB:
 
         return third_box_path
 
-    def add(self, path: str, value: Union[dict, str, int, float, bool]) -> None:
-        if not isinstance(path, str):
-            raise KeyIsNotAStringError('The path must be a string')
-
-        key_list = path.split('/')
-        prev_path = None
-
-        for key in key_list:
-            prev_path = self._prepare_block(key, prev_path)
+    def add(self, key: str, value: Union[dict, str, int, float, bool]) -> None:
+        if not isinstance(key, str):
+            raise KeyIsNotAStringError('The key must be a string')
 
         if isinstance(value, dict):
-            for k, v in value.items():
-                new_path = '/'.join((path, k))
-                self.add(new_path, v)
-        else:
-            data_path = os.path.join(prev_path, key_list[-1])
-            item = self._create_item(value)
+            raise ValueNotSupportedError(f'"dict" is not a supported type')
 
-            with open(data_path, 'wb') as f:
-                f.write(item)
+        block_path = self._prepare_block(key)
+        data_path = os.path.join(block_path, key)
+        item = self._create_item(value)
 
-    def get(self, path: str) -> Union[None, str]:
-        if not isinstance(path, str):
-            raise KeyIsNotAStringError('The path must be a string')
+        with open(data_path, 'wb') as f:
+            f.write(item)
 
-        key_list = path.split('/')
-        prev_path = None
+    def get(self, key: str) -> Union[None, str]:
+        if not isinstance(key, str):
+            raise KeyIsNotAStringError('The key must be a string')
 
-        for key in key_list:
-            if prev_path:
-                key_path = self._map_key(key, previous_path=prev_path)
-            else:
-                key_path = self._map_key(key)
-
-            prev_path = key_path
-
-        data_file_path = os.path.join(prev_path, key_list[-1])
+        key_path = self._map_key(key)
+        data_file_path = os.path.join(key_path, key)
 
         if os.path.isfile(data_file_path):
             with open(data_file_path, 'rb') as f:
