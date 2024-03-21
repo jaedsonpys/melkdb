@@ -4,17 +4,17 @@ from faker import Faker
 from melkdb import melkdb
 from time import time
 
-from random import randint
+DATA_NUM = 10_000
 
-DATA_NUM = 1_000
-
+data = list()
 fake = Faker()
 db = melkdb.MelkDB('speedtest')
 
 print('\033[33mGenerate names list...\033[m')
 
-fake_value = {'address': fake.address(), 'text': fake.text()}
-data = [(fake.name(), fake_value) for _ in range(DATA_NUM)]
+for __ in range(DATA_NUM):
+    name = fake.name()
+    data.append((name, name))
 
 print(f'\033[32m{len(data)} data generated\033[m')
 print('-=' * 15)
@@ -32,15 +32,14 @@ print('-=' * 15)
 print('\033[33mGetting all items from database...\033[m')
 full_get_time = 0
 
-for __ in range(DATA_NUM):
-    choose = randint(0, DATA_NUM)
+for choose in range(DATA_NUM):
     name = data[choose][0]
 
     s_get = time()
-    value = db.get(f'{name}/address')
+    value = db.get(name)
     e_get = time()
 
-    assert value == data[choose][1]['address']
+    assert value == data[choose][1]
 
     get_time = e_get-s_get
     full_get_time += get_time
