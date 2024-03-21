@@ -96,9 +96,6 @@ class MelkDB:
         if not isinstance(key, str):
             raise KeyIsNotAStringError('The key must be a string')
 
-        if isinstance(value, dict):
-            raise ValueNotSupportedError(f'"dict" is not a supported type')
-
         block_path = self._prepare_block(key)
         data_path = os.path.join(block_path, key)
         item = self._create_item(value)
