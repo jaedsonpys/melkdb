@@ -92,7 +92,7 @@ class MelkDB:
 
         return third_box_path
 
-    def add(self, key: str, value: Union[dict, str, int, float, bool]) -> None:
+    def add(self, key: str, value: Union[str, int, float, bool]) -> None:
         if not isinstance(key, str):
             raise KeyIsNotAStringError('The key must be a string')
 
