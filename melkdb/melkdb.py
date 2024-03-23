@@ -6,7 +6,7 @@ from typing import Union
 from pathlib import Path
 
 from .exceptions import *
-from .__init__ import __version__
+from .__version__ import __version__
 
 HOME_PATH = Path().home()
 MELKDB_STORAGE_PATH = os.path.join(HOME_PATH, '.melkdb.databases')

@@ -1,3 +1,2 @@
 from .melkdb import MelkDB
-
-__version__ = '0.1.0'
+from .__version__ import __version__
