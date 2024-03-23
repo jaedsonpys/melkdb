@@ -4,7 +4,7 @@ import struct
 
 from typing import Union
 from pathlib import Path
-from io import BufferedReader
+from io import BufferedReader, BytesIO
 
 from .exceptions import *
 from .crypto import Cryptography
@@ -49,8 +49,7 @@ class MelkDB:
                 raise IncompatibleDatabaseError(f'Database created with {db_major_v}.x.x'
                                                  'MelkDB version')
 
-    @staticmethod
-    def _create_item(value: Union[str, int, float, bool]) -> bytes:
+    def _create_item(self, value: Union[str, int, float, bool]) -> bytes:
         if isinstance(value, str):
             vlen = len(value)
             pack_fmt = f'{vlen}s'
@@ -68,10 +67,17 @@ class MelkDB:
             raise ValueNotSupportedError(f'type {type(value)} is not supported')
 
         item = struct.pack(f'<h{pack_fmt}', vlen, value)
+
+        if self._crypto:
+            item = self._crypto.encrypt(item)
+
         return item
 
-    @staticmethod
-    def _get_item(buf_reader: BufferedReader) -> Union[str, int, float, bool]:
+    def _get_item(self, buf_reader: BufferedReader) -> Union[str, int, float, bool]:
+        if self._crypto:
+            buf_reader = self._crypto.decrypt(buf_reader.read())
+            buf_reader = BytesIO(buf_reader)
+
         vlen, = struct.unpack('h', buf_reader.read(2))
 
         if vlen == INT_TYPE:
