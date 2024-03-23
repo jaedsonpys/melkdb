@@ -6,6 +6,7 @@ from typing import Union
 from pathlib import Path
 
 from .exceptions import *
+from .crypto import Cryptography
 from .__version__ import __version__
 
 HOME_PATH = Path().home()
@@ -20,8 +21,13 @@ if not os.path.isdir(MELKDB_STORAGE_PATH):
 
 
 class MelkDB:
-    def __init__(self, name: str):
+    def __init__(self, name: str, encrypt_key: Union[None, str] = None):
         self._db_path = os.path.join(MELKDB_STORAGE_PATH, name)
+        self._crypto = None
+
+        if encrypt_key:
+            self._crypto = Cryptography(encrypt_key)
+
         db_config_path = os.path.join(self._db_path, 'config.json')
         
         if not os.path.isdir(self._db_path):
