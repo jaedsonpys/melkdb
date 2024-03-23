@@ -8,6 +8,7 @@ from io import BufferedReader, BytesIO
 
 from .exceptions import *
 from .crypto import Cryptography
+from . import utils
 from .__version__ import __version__
 
 HOME_PATH = Path().home()
@@ -132,6 +133,9 @@ class MelkDB:
         if not isinstance(key, str):
             raise KeyIsNotAStringError('The key must be a string')
 
+        if not utils.key_is_valid(key):
+            raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
+
         block_path = self._prepare_block(key)
         data_path = os.path.join(block_path, key)
         item = self._create_item(value)
@@ -142,6 +146,9 @@ class MelkDB:
     def get(self, key: str) -> Union[None, str]:
         if not isinstance(key, str):
             raise KeyIsNotAStringError('The key must be a string')
+        
+        if not utils.key_is_valid(key):
+            raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
         key_path = self._map_key(key)
         data_file_path = os.path.join(key_path, key)
