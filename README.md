@@ -4,11 +4,11 @@ MelkDB é um banco de dados modelo `key-value` em desenvolvimento. Com **velocid
 
 > Este projeto está em desenvolvimento, novas funcionalidades e correções serão feitas a cada nova versão lançada. Por favor, informe-nos sobre qualquer tipo de erro encontrado ao utilizar este projeto.
 
-## Faça seu teste
+## Faça um teste de velocidade
 
 Teste a velocidade e desempenho do banco de dados usando o script `speedtest.py`, desenvolvido para exibir o *tempo de execução* em operações de adicionar e obter dados.
 
-Em testes realizados utilizando um computador com processador **Intel Celeron Dual Core de 2.16GHz** e um SSD, obtemosos seguintes dados:
+Em testes realizados utilizando um computador com processador **Intel Celeron Dual Core de 2.16GHz** e um SSD, obtemos seguintes dados:
 
 | N° de dados   | Tempo para adicionar | Tempo para obter |
 | ------------- | -------------------- | ---------------- |
