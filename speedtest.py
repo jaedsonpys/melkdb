@@ -1,14 +1,14 @@
 # install Faker: pip install Faker
 
 from faker import Faker
-from melkdb import melkdb
+from melkdb import MelkDB
 from time import time
 
 DATA_NUM = 10_000
 
 data = list()
 fake = Faker()
-db = melkdb.MelkDB('speedtest')
+db = MelkDB('speedtest')
 
 print('\033[33mGenerate names list...\033[m')
 
