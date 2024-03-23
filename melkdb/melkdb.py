@@ -42,7 +42,6 @@ class MelkDB:
                 raise IncompatibleDatabaseError(f'Database created with {db_major_v}.x.x'
                                                  'MelkDB version')
 
-
     @staticmethod
     def _create_item(value: Union[str, int, float, bool]) -> bytes:
         if isinstance(value, str):
