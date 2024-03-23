@@ -4,6 +4,7 @@ import struct
 
 from typing import Union
 from pathlib import Path
+from io import BufferedReader
 
 from .exceptions import *
 from .crypto import Cryptography
@@ -69,6 +70,30 @@ class MelkDB:
         item = struct.pack(f'<h{pack_fmt}', vlen, value)
         return item
 
+    @staticmethod
+    def _get_item(buf_reader: BufferedReader) -> Union[str, int, float, bool]:
+        vlen, = struct.unpack('h', buf_reader.read(2))
+
+        if vlen == INT_TYPE:
+            fmt = 'i'
+            rsize = 4
+        elif vlen == FLOAT_TYPE:
+            fmt = 'f'
+            rsize = 4
+        elif vlen == BOOL_TYPE:
+            fmt = '?'
+            rsize = 1
+        else:
+            fmt = f'{vlen}s'
+            rsize = vlen
+
+        value, = struct.unpack(f'<{fmt}', buf_reader.read(rsize))
+
+        if isinstance(value, bytes):
+            value = value.decode()
+
+        return value
+
     def _map_key(self, key: str) -> str:
         klen = str(len(key))
         first_letter = key[0]
@@ -117,24 +142,6 @@ class MelkDB:
 
         if os.path.isfile(data_file_path):
             with open(data_file_path, 'rb') as f:
-                vlen, = struct.unpack('h', f.read(2))
-
-                if vlen == INT_TYPE:
-                    fmt = 'i'
-                    rsize = 4
-                elif vlen == FLOAT_TYPE:
-                    fmt = 'f'
-                    rsize = 4
-                elif vlen == BOOL_TYPE:
-                    fmt = '?'
-                    rsize = 1
-                else:
-                    fmt = f'{vlen}s'
-                    rsize = vlen
-
-                value, = struct.unpack(f'<{fmt}', f.read(rsize))
-
-                if isinstance(value, bytes):
-                    value = value.decode()
+                value = self._get_item(f)
 
             return value
