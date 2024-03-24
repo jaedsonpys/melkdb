@@ -17,7 +17,8 @@ setup(
     packages=['melkdb'],
     url='https://github.com/jaedsonpys/melkdb',
     project_urls={
-        'License': 'https://github.com/jaedsonpys/melkdb/blob/master/LICENSE'
+        'License': 'https://github.com/jaedsonpys/melkdb/blob/master/LICENSE',
+        'Documentation': 'https://github.com/jaedsonpys/melkdb/tree/master/docs'
     },
     classifiers=[
         'License :: OSI Approved :: MIT License',
