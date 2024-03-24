@@ -229,6 +229,9 @@ class MelkDB:
         This method is just a shortcut to use
         `delete()` and `add()` methods.
 
+        A exception will be raised if key not 
+        exists in database.
+
         :param key: Item key
         :type key: str
         :param value: Item value
