@@ -52,12 +52,22 @@ class MelkDB:
             os.mkdir(self._db_path)
 
             with open(db_config_path, 'w') as f:
-                json.dump({'version': __version__}, f)
+                if crypto:
+                    is_crypto = True
+                else:
+                    is_crypto = False
+
+                config = {'version': __version__, 'iscrypto': is_crypto}
+                json.dump(config, f)
         else:
             with open(db_config_path, 'rb') as f:
                 config = json.load(f)
 
             db_version = config['version']
+            db_crypto = config['iscrypto']
+
+            if db_crypto and not encrypt_key:
+                raise EncryptKeyRequiredError('This database requires cryptography')
 
             current_major_v = __version__.split('.')[0]
             db_major_v = db_version.split('.')[0]
