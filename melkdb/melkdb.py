@@ -24,6 +24,23 @@ if not os.path.isdir(MELKDB_STORAGE_PATH):
 
 class MelkDB:
     def __init__(self, name: str, encrypt_key: Union[None, str] = None):
+        """Create a instance of MelkDB class.
+
+        A database with the specified name will be
+        created if not exists.
+
+        To encrypt data, you must be pass a strong key
+        to `encrypt_key` parameter. Weak encrypt keys
+        are a potential risk to the database.
+
+        :param name: Database name
+        :type name: str
+        :param encrypt_key: Encrypt key , defaults to None
+        :type encrypt_key: Union[None, str], optional
+        :raises IncompatibleDatabaseError: If database version not
+        match with current MelkDB version.
+        """
+
         self._db_path = os.path.join(MELKDB_STORAGE_PATH, name)
         self._crypto = None
 
@@ -130,6 +147,16 @@ class MelkDB:
         return third_box_path
 
     def add(self, key: str, value: Union[str, int, float, bool]) -> None:
+        """Add a item to database.
+
+        :param key: Item key
+        :type key: str
+        :param value: Item value
+        :type value: Union[str, int, float, bool]
+        :raises KeyIsNotAStringError: If key is not string
+        :raises InvalidCharInKeyError: If key has a invalid char
+        """
+
         if not isinstance(key, str):
             raise KeyIsNotAStringError('The key must be a string')
 
@@ -143,7 +170,17 @@ class MelkDB:
         with open(data_path, 'wb') as f:
             f.write(item)
 
-    def get(self, key: str) -> Union[None, str]:
+    def get(self, key: str) -> Union[None, str, int, float, bool]:
+        """Get a item from database
+
+        :param key: Item key
+        :type key: str
+        :raises KeyIsNotAStringError: If key is not a string
+        :raises InvalidCharInKeyError: If key has a invalid char
+        :return: Returns the item value
+        :rtype: Union[None, str, int, float, bool]
+        """
+
         if not isinstance(key, str):
             raise KeyIsNotAStringError('The key must be a string')
         
