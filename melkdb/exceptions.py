@@ -21,3 +21,8 @@ class IncompatibleDatabaseError(Exception):
 class DecryptFailed(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+
+class ItemNotExistsError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

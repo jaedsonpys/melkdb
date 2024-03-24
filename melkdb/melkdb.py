@@ -195,3 +195,30 @@ class MelkDB:
                 value = self._get_item(f)
 
             return value
+
+    def delete(self, key: str) -> None:
+        """Delete a item from database
+
+        A exception must be raised if item
+        not exists in database.
+
+        :param key: Item key
+        :type key: str
+        :raises KeyIsNotAStringError: If key is not a string
+        :raises InvalidCharInKeyError: If key has a invalid char
+        :raises ItemNotExistsError: If item not exists
+        """
+        
+        if not isinstance(key, str):
+            raise KeyIsNotAStringError('The key must be a string')
+        
+        if not utils.key_is_valid(key):
+            raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
+
+        key_path = self._map_key(key)
+        data_file_path = os.path.join(key_path, key)
+
+        if os.path.isfile(data_file_path):
+            os.remove(data_file_path)
+        else:
+            raise ItemNotExistsError(f'Item {repr(key)} not exists')
