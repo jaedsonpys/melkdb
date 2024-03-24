@@ -45,7 +45,7 @@ print(db.get("latest_news"))
 db.delete("latest_news")
 ```
 
-Veja a documentação completa para aprender mais sobre o funcionamento e métodos disponíveis para uso do MelkDB.
+Veja a [documentação completa](https://github.com/jaedsonpys/melkdb/tree/master/docs) para aprender mais sobre o funcionamento e métodos disponíveis para uso do MelkDB.
 
 ## Licença de uso
 
