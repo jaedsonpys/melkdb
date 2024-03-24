@@ -7,6 +7,7 @@ from pathlib import Path
 from .__version__ import __version__
 from .crypto import Cryptography
 from .exceptions import *
+from ._block import Block
 from ._item import Item
 from . import utils
 
@@ -43,6 +44,8 @@ class MelkDB:
             crypto = Cryptography(encrypt_key)
 
         self._item = Item(crypto)
+        self._block = Block(self._db_path)
+
         db_config_path = os.path.join(self._db_path, 'config.json')
         
         if not os.path.isdir(self._db_path):
@@ -63,34 +66,6 @@ class MelkDB:
                 raise IncompatibleDatabaseError(f'Database created with {db_major_v}.x.x'
                                                  'MelkDB version')
 
-    def _map_key(self, key: str) -> str:
-        klen = str(len(key))
-        first_letter = key[0]
-        last_letter = key[-1]
-        return os.path.join(self._db_path, klen, first_letter, last_letter)
-
-    def _prepare_block(self, key: str) -> str:
-        klen = str(len(key))
-        first_letter = key[0]
-        last_letter = key[-1]
-
-        first_box_path = os.path.join(self._db_path, klen)
-
-        if not os.path.isdir(first_box_path):
-            os.mkdir(first_box_path)
-
-        second_box_path = os.path.join(first_box_path, first_letter)
-
-        if not os.path.isdir(second_box_path):
-            os.mkdir(second_box_path)
-
-        third_box_path = os.path.join(second_box_path, last_letter)
-
-        if not os.path.isdir(third_box_path):
-            os.mkdir(third_box_path)
-
-        return third_box_path
-
     def add(self, key: str, value: Union[str, int, float, bool]) -> None:
         """Add a item to database.
 
@@ -108,7 +83,7 @@ class MelkDB:
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
-        block_path = self._prepare_block(key)
+        block_path = self._block.make_path(key)
         data_path = os.path.join(block_path, key)
         item = self._item.encode(value)
 
@@ -132,7 +107,7 @@ class MelkDB:
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
-        key_path = self._map_key(key)
+        key_path = self._block.get_path(key)
         data_file_path = os.path.join(key_path, key)
 
         if os.path.isfile(data_file_path):
@@ -160,7 +135,7 @@ class MelkDB:
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
-        key_path = self._map_key(key)
+        key_path = self._block.get_path(key)
         data_file_path = os.path.join(key_path, key)
 
         if os.path.isfile(data_file_path):
