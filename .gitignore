@@ -1,4 +1,9 @@
+# python
 __pycache__/
+venv/
 main.py
 
-venv/
+# setup
+dist/
+build/
+*.egg-info
