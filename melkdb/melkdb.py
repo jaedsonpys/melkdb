@@ -222,3 +222,18 @@ class MelkDB:
             os.remove(data_file_path)
         else:
             raise ItemNotExistsError(f'Item {repr(key)} not exists')
+
+    def update(self, key: str, value: Union[str, int, float, bool]) -> None:
+        """Update a item in database.
+
+        This method is just a shortcut to use
+        `delete()` and `add()` methods.
+
+        :param key: Item key
+        :type key: str
+        :param value: Item value
+        :type value: Union[str, int, float, bool]
+        """
+
+        self.delete(key)
+        self.add(key, value)
