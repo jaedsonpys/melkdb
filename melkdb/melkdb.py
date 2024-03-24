@@ -67,13 +67,15 @@ class MelkDB:
             db_crypto = config['iscrypto']
 
             if db_crypto and not encrypt_key:
-                raise EncryptKeyRequiredError('This database requires cryptography')
+                raise EncryptKeyRequiredError(f'{repr(name)} requires cryptography')
+            elif not db_crypto and encrypt_key:
+                raise DatabaseNotEncryptedError(f'{repr(name)} is created without cryptography')
 
             current_major_v = __version__.split('.')[0]
             db_major_v = db_version.split('.')[0]
 
             if current_major_v != db_major_v:
-                raise IncompatibleDatabaseError(f'Database created with {db_major_v}.x.x'
+                raise IncompatibleDatabaseError(f'{repr(name)} created with {db_major_v}.x.x'
                                                  'MelkDB version')
 
     def add(self, key: str, value: Union[str, int, float, bool]) -> None:

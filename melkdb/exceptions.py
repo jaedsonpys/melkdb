@@ -8,6 +8,11 @@ class EncryptKeyRequiredError(Exception):
         super().__init__(*args)
 
 
+class DatabaseNotEncryptedError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
 class KeyIsNotAStringError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
