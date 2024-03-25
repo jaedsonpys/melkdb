@@ -48,7 +48,7 @@ class TestItem(bupytest.UnitTest):
 
         self.item_handle = _item.Item()
 
-    def test_encode_without_cryptography(self):
+    def test_encode(self):
         data = 'MelkDB'
         data_len = len(data)
 
