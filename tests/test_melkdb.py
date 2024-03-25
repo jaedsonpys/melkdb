@@ -68,11 +68,40 @@ class TestItem(bupytest.UnitTest):
         self.assert_expected(decoded, 'MelkDB', message='Invalid decoded data')
 
 
+class TestMelkDB(bupytest.UnitTest):
+    def __init__(self):
+        super().__init__()
+
+        self.db = melkdb.MelkDB('cache')
+    
+    def test_add(self):
+        self.db.add('latest_user_online', 'Melk')
+        self.db.add('latest_user_added', 'Jaedson')
+    
+    def test_get(self):
+        data = self.db.get('latest_user_online')
+        self.assert_expected(data, 'Melk', message='Data is not equal to original')
+    
+    def test_update(self):
+        self.db.update('latest_user_online', 'Jaedson')
+        new_data = self.db.get('latest_user_online')
+        self.assert_expected(new_data, 'Jaedson', message='Data not updated in database')
+    
+    def test_delete(self):
+        self.db.delete('latest_user_online')
+        deleted_data = self.db.get('latest_user_online')
+        self.assert_expected(deleted_data, None, message='Data not deleted from database')
+
+    def test_check_secundary_item(self):
+        data = self.db.get('latest_user_added')
+        self.assert_expected(data, 'Jaedson', message='Secundary item modified')
+
+
 class TestMelkDBEncrypted(bupytest.UnitTest):
     def __init__(self):
         super().__init__()
 
-        self.db = melkdb.MelkDB('cache', encrypt_key='thisisanotsecurekey')
+        self.db = melkdb.MelkDB('cache2', encrypt_key='thisisanotsecurekey')
     
     def test_add(self):
         self.db.add('latest_user_online', 'Melk')
