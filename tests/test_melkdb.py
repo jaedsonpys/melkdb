@@ -61,6 +61,11 @@ class TestItem(bupytest.UnitTest):
         self.assert_expected(enc_data_len, data_len, message='Invalid data length')
         self.assert_expected(enc_data.decode(), data, message='Invalid encoded data')
 
+    def test_decode(self):
+        encoded = self.item_handle.encode('MelkDB')
+        decoded = self.item_handle.decode(BytesIO(encoded))
+        self.assert_expected(decoded, 'MelkDB', message='Invalid decoded data')
+
 
 if __name__ == '__main__':
     bupytest.this()
