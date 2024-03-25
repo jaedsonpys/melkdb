@@ -1,5 +1,9 @@
 from setuptools import setup
-from melkdb.__version__ import __version__
+
+_version_globals = dict()
+
+with open('melkdb/__version__.py') as f:
+    exec(f.read(), _version_globals)
 
 with open(f'README.md', 'r') as reader:
     readme = reader.read()
@@ -9,7 +13,7 @@ setup(
     author_email='jaedson.dev@proton.me',
     name='melkdb',
     description='MelkDB: A faster key-value database',
-    version=__version__,
+    version=_version_globals['__version__'],
     long_description_content_type='text/markdown',
     long_description=readme,
     license='MIT License',
