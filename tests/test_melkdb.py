@@ -32,3 +32,7 @@ class TestCryptography(bupytest.UnitTest):
             self.assert_true(True)
         else:
             self.assert_true(False, message='Expected exception not raised')
+
+
+if __name__ == '__main__':
+    bupytest.this()
