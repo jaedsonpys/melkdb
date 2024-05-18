@@ -89,7 +89,9 @@ class MelkDB:
                 data_path = os.path.join(block, kp)
             else:
                 sub_block_path = os.path.join(block, kp)
-                os.mkdir(sub_block_path)
+
+                if not os.path.isdir(sub_block_path):
+                    os.mkdir(sub_block_path)
 
         with open(data_path, 'wb') as f:
             item = self._item.encode(value)
