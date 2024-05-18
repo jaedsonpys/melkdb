@@ -78,6 +78,23 @@ class MelkDB:
                 raise IncompatibleDatabaseError(f'{repr(name)} created with {db_major_v}.x.x'
                                                  'MelkDB version')
 
+    def _add_tree(self, key_parts: list, value: Union[str, int, float, bool]) -> None:
+        key_parts_len = len(key_parts)
+        sub_block_path = None
+
+        for index, kp in enumerate(key_parts):
+            block = self._block.make_path(kp, previous_path=sub_block_path)
+
+            if index == (key_parts_len - 1):
+                data_path = os.path.join(block, kp)
+            else:
+                sub_block_path = os.path.join(block, kp)
+                os.mkdir(sub_block_path)
+
+        with open(data_path, 'wb') as f:
+            item = self._item.encode(value)
+            f.write(item)
+
     def add(self, key: str, value: Union[str, int, float, bool]) -> None:
         """Add a item to database.
 
@@ -95,12 +112,17 @@ class MelkDB:
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
-        block_path = self._block.make_path(key)
-        data_path = os.path.join(block_path, key)
-        item = self._item.encode(value)
+        key_parts = key.split('/')
 
-        with open(data_path, 'wb') as f:
-            f.write(item)
+        if len(key_parts) > 1:
+            self._add_tree(key_parts, value)
+        else:
+            block_path = self._block.make_path(key)
+            data_path = os.path.join(block_path, key)
+            item = self._item.encode(value)
+
+            with open(data_path, 'wb') as f:
+                f.write(item)
 
     def get(self, key: str) -> Union[None, str, int, float, bool]:
         """Get a item from database
