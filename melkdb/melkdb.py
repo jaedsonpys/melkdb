@@ -124,6 +124,19 @@ class MelkDB:
             with open(data_path, 'wb') as f:
                 f.write(item)
 
+    def _get_tree(self, key_parts: list) -> Union[None, str, int, float, bool]:
+        tree_key_path = None
+
+        for kp in key_parts:
+            key_path = self._block.get_path(kp, tree_key_path)
+            tree_key_path = os.path.join(key_path, kp)
+
+        if os.path.isfile(tree_key_path):
+            with open(tree_key_path, 'rb') as f:
+                value = self._item.decode(f)
+
+            return value
+
     def get(self, key: str) -> Union[None, str, int, float, bool]:
         """Get a item from database
 
@@ -140,6 +153,11 @@ class MelkDB:
         
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
+
+        key_parts = key.split('/')
+
+        if len(key_parts) > 1:
+            return self._get_tree(key_parts)
 
         key_path = self._block.get_path(key)
         data_file_path = os.path.join(key_path, key)
