@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Union, List
 
 
 class Block:
@@ -22,6 +22,26 @@ class Block:
         """
 
         self._db_path = database_path
+
+    def get_tree_path(self, key_parts: List[str]) -> str:
+        """Mount complex key block.
+
+        A complex key is multiples keys separated
+        by slash. Example: "user/name"
+
+        :param key_parts: Splited key list
+        :type key_parts: List[str]
+        :return: Block path
+        :rtype: str
+        """
+
+        tree_key_path = None
+
+        for kp in key_parts:
+            key_path = self.get_path(kp, tree_key_path)
+            tree_key_path = os.path.join(key_path, kp)
+
+        return tree_key_path
 
     def get_path(self, key: str, previous_path: Union[None, str] = None) -> str:
         """Mount key block.
