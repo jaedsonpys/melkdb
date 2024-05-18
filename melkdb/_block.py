@@ -23,7 +23,7 @@ class Block:
 
         self._db_path = database_path
 
-    def get_path(self, key: str) -> str:
+    def get_path(self, key: str, previous_path: Union[None, str] = None) -> str:
         """Mount key block.
 
         :param key: Item key
@@ -32,10 +32,16 @@ class Block:
         :rtype: str
         """
 
+        base_path = self._db_path
+
         klen = str(len(key))
         first_letter = key[0]
         last_letter = key[-1]
-        return os.path.join(self._db_path, klen, first_letter, last_letter)
+
+        if previous_path:
+            base_path = previous_path
+
+        return os.path.join(base_path, klen, first_letter, last_letter)
 
     def make_path(self, key: str, previous_path: Union[None, str] = None) -> str:
         """Create a block.
