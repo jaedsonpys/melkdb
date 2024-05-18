@@ -1,4 +1,5 @@
 import os
+from typing import Union
 
 
 class Block:
@@ -36,7 +37,7 @@ class Block:
         last_letter = key[-1]
         return os.path.join(self._db_path, klen, first_letter, last_letter)
 
-    def make_path(self, key: str) -> str:
+    def make_path(self, key: str, previous_path: Union[None, str] = None) -> str:
         """Create a block.
 
         :param key: Item path
@@ -49,7 +50,12 @@ class Block:
         first_letter = key[0]
         last_letter = key[-1]
 
-        first_box_path = os.path.join(self._db_path, klen)
+        base_path = self._db_path
+
+        if previous_path:
+            base_path = previous_path
+
+        first_box_path = os.path.join(base_path, klen)
 
         if not os.path.isdir(first_box_path):
             os.mkdir(first_box_path)
