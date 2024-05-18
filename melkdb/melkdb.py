@@ -91,6 +91,9 @@ class MelkDB:
             else:
                 sub_block_path = os.path.join(block, kp)
 
+                if os.path.isfile(sub_block_path):
+                    raise ItemIsNotATreeError(f'Item {repr(kp)} is not a tree')
+
                 if not os.path.isdir(sub_block_path):
                     os.mkdir(sub_block_path)
 
