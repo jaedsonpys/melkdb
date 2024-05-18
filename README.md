@@ -30,19 +30,11 @@ Finalizando a instalação, o banco de dados MelkDB já está pronto para ser ut
 ```python
 from melkdb import MelkDB
 
-db = MelkDB('cache')
+db = MelkDB('users')
 
-# adicionando um item
-db.add("latest_news", "Conteúdo das últimas notícias")
-
-# atualizando um item
-db.update("latest_news", "MelkDB é lançado oficialmente")
-
-# obtendo um item
-print(db.get("latest_news"))
-
-# deletando um item
-db.delete("latest_news")
+db.add('users/melk/name', 'Melk')
+db.add('users/melk/age', 18)
+db.add('users/melk/isTheBestCat', True)
 ```
 
 Veja a [documentação completa](https://github.com/jaedsonpys/melkdb/tree/master/docs) para aprender mais sobre o funcionamento e métodos disponíveis para uso do MelkDB.
