@@ -1,5 +1,6 @@
 import os
 import json
+import shutil
 
 from typing import Union
 from pathlib import Path
@@ -193,11 +194,24 @@ class MelkDB:
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
-        key_path = self._block.get_path(key)
-        data_file_path = os.path.join(key_path, key)
+        key_parts = key.split('/')
+
+        if len(key_parts) > 1:
+            tree_key_path = None
+
+            for kp in key_parts:
+                key_path = self._block.get_path(kp, tree_key_path)
+                tree_key_path = os.path.join(key_path, kp)
+
+            data_file_path = tree_key_path
+        else:
+            key_path = self._block.get_path(key)
+            data_file_path = os.path.join(key_path, key)
 
         if os.path.isfile(data_file_path):
             os.remove(data_file_path)
+        elif os.path.isdir(data_file_path):
+            shutil.rmtree(data_file_path, ignore_errors=True)
         else:
             raise ItemNotExistsError(f'Item {repr(key)} not exists')
 
