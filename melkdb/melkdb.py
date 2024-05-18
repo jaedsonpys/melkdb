@@ -138,6 +138,8 @@ class MelkDB:
                 value = self._item.decode(f)
 
             return value
+        elif os.path.isdir(tree_key_path):
+            raise KeyIsATreeError(f'you can\'t get the full {repr(kp)} tree')
 
     def get(self, key: str) -> Union[None, str, int, float, bool]:
         """Get a item from database
@@ -169,6 +171,8 @@ class MelkDB:
                 value = self._item.decode(f)
 
             return value
+        elif os.path.isdir(data_file_path):
+            raise KeyIsATreeError(f'you can\'t get the full {repr(key)} tree')
 
     def delete(self, key: str) -> None:
         """Delete a item from database
