@@ -1,4 +1,5 @@
 import os
+from typing import Union, List
 
 
 class Block:
@@ -22,7 +23,27 @@ class Block:
 
         self._db_path = database_path
 
-    def get_path(self, key: str) -> str:
+    def get_tree_path(self, key_parts: List[str]) -> str:
+        """Mount complex key block.
+
+        A complex key is multiples keys separated
+        by slash. Example: "user/name"
+
+        :param key_parts: Splited key list
+        :type key_parts: List[str]
+        :return: Block path
+        :rtype: str
+        """
+
+        tree_key_path = None
+
+        for kp in key_parts:
+            key_path = self.get_path(kp, tree_key_path)
+            tree_key_path = os.path.join(key_path, kp)
+
+        return tree_key_path
+
+    def get_path(self, key: str, previous_path: Union[None, str] = None) -> str:
         """Mount key block.
 
         :param key: Item key
@@ -31,12 +52,18 @@ class Block:
         :rtype: str
         """
 
+        base_path = self._db_path
+
         klen = str(len(key))
         first_letter = key[0]
         last_letter = key[-1]
-        return os.path.join(self._db_path, klen, first_letter, last_letter)
 
-    def make_path(self, key: str) -> str:
+        if previous_path:
+            base_path = previous_path
+
+        return os.path.join(base_path, klen, first_letter, last_letter)
+
+    def make_path(self, key: str, previous_path: Union[None, str] = None) -> str:
         """Create a block.
 
         :param key: Item path
@@ -49,7 +76,12 @@ class Block:
         first_letter = key[0]
         last_letter = key[-1]
 
-        first_box_path = os.path.join(self._db_path, klen)
+        base_path = self._db_path
+
+        if previous_path:
+            base_path = previous_path
+
+        first_box_path = os.path.join(base_path, klen)
 
         if not os.path.isdir(first_box_path):
             os.mkdir(first_box_path)

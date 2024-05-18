@@ -72,29 +72,42 @@ class TestMelkDB(bupytest.UnitTest):
     def __init__(self):
         super().__init__()
 
-        self.db = melkdb.MelkDB('cache')
+        self.db = melkdb.MelkDB('users')
     
     def test_add(self):
         self.db.add('latest_user_online', 'Melk')
-        self.db.add('latest_user_added', 'Jaedson')
+        self.db.add('users/melk/name', 'Melk')
+        self.db.add('users/mel/name', 'Mel')
     
     def test_get(self):
-        data = self.db.get('latest_user_online')
-        self.assert_expected(data, 'Melk', message='Data is not equal to original')
-    
+        latest_user_online = self.db.get('latest_user_online')
+        melk_user_name = self.db.get('users/melk/name')
+        mel_user_name = self.db.get('users/mel/name')
+
+        self.assert_expected(melk_user_name, 'Melk', message='Data is not equal to original')
+        self.assert_expected(mel_user_name, 'Mel', message='Data is not equal to original')
+        self.assert_expected(latest_user_online, 'Melk', message='Data is not equal to original')
+
     def test_update(self):
         self.db.update('latest_user_online', 'Jaedson')
-        new_data = self.db.get('latest_user_online')
-        self.assert_expected(new_data, 'Jaedson', message='Data not updated in database')
+        self.db.update('users/melk/name', 'Melk Silva')
+
+        new_latest_user = self.db.get('latest_user_online')
+        new_user_name = self.db.get('users/melk/name')
+
+        self.assert_expected(new_latest_user, 'Jaedson', message='Data not updated in database')
+        self.assert_expected(new_user_name, 'Melk Silva', message='Data not updated in database')
     
     def test_delete(self):
         self.db.delete('latest_user_online')
-        deleted_data = self.db.get('latest_user_online')
-        self.assert_expected(deleted_data, None, message='Data not deleted from database')
+        self.db.delete('users/melk')
+
+        self.assert_false(self.db.get('latest_user_online'), message='Data not deleted from database')
+        self.assert_false(self.db.get('users/melk/name'), message='Data not deleted from database')
 
     def test_check_secundary_item(self):
-        data = self.db.get('latest_user_added')
-        self.assert_expected(data, 'Jaedson', message='Secundary item modified')
+        data = self.db.get('users/mel/name')
+        self.assert_expected(data, 'Mel', message='Secundary item modified')
 
 
 class TestMelkDBEncrypted(bupytest.UnitTest):
@@ -105,25 +118,38 @@ class TestMelkDBEncrypted(bupytest.UnitTest):
     
     def test_add(self):
         self.db.add('latest_user_online', 'Melk')
-        self.db.add('latest_user_added', 'Jaedson')
+        self.db.add('users/melk/name', 'Melk')
+        self.db.add('users/mel/name', 'Mel')
     
     def test_get(self):
-        data = self.db.get('latest_user_online')
-        self.assert_expected(data, 'Melk', message='Data is not equal to original')
-    
+        latest_user_online = self.db.get('latest_user_online')
+        melk_user_name = self.db.get('users/melk/name')
+        mel_user_name = self.db.get('users/mel/name')
+
+        self.assert_expected(melk_user_name, 'Melk', message='Data is not equal to original')
+        self.assert_expected(mel_user_name, 'Mel', message='Data is not equal to original')
+        self.assert_expected(latest_user_online, 'Melk', message='Data is not equal to original')
+
     def test_update(self):
         self.db.update('latest_user_online', 'Jaedson')
-        new_data = self.db.get('latest_user_online')
-        self.assert_expected(new_data, 'Jaedson', message='Data not updated in database')
+        self.db.update('users/melk/name', 'Melk Silva')
+
+        new_latest_user = self.db.get('latest_user_online')
+        new_user_name = self.db.get('users/melk/name')
+
+        self.assert_expected(new_latest_user, 'Jaedson', message='Data not updated in database')
+        self.assert_expected(new_user_name, 'Melk Silva', message='Data not updated in database')
     
     def test_delete(self):
         self.db.delete('latest_user_online')
-        deleted_data = self.db.get('latest_user_online')
-        self.assert_expected(deleted_data, None, message='Data not deleted from database')
+        self.db.delete('users/melk')
+
+        self.assert_false(self.db.get('latest_user_online'), message='Data not deleted from database')
+        self.assert_false(self.db.get('users/melk/name'), message='Data not deleted from database')
 
     def test_check_secundary_item(self):
-        data = self.db.get('latest_user_added')
-        self.assert_expected(data, 'Jaedson', message='Secundary item modified')
+        data = self.db.get('users/mel/name')
+        self.assert_expected(data, 'Mel', message='Secundary item modified')
 
 
 if __name__ == '__main__':

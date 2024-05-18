@@ -36,3 +36,13 @@ class DecryptFailed(Exception):
 class ItemNotExistsError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+
+class KeyIsATreeError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
+class ItemIsNotATreeError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

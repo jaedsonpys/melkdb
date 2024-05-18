@@ -1,5 +1,6 @@
 import os
 import json
+import shutil
 
 from typing import Union
 from pathlib import Path
@@ -78,6 +79,28 @@ class MelkDB:
                 raise IncompatibleDatabaseError(f'{repr(name)} created with {db_major_v}.x.x'
                                                  'MelkDB version')
 
+    def _add_tree(self, key_parts: list, value: Union[str, int, float, bool]) -> None:
+        key_parts_len = len(key_parts)
+        sub_block_path = None
+
+        for index, kp in enumerate(key_parts):
+            block = self._block.make_path(kp, previous_path=sub_block_path)
+
+            if index == (key_parts_len - 1):
+                data_path = os.path.join(block, kp)
+            else:
+                sub_block_path = os.path.join(block, kp)
+
+                if os.path.isfile(sub_block_path):
+                    raise ItemIsNotATreeError(f'Item {repr(kp)} is not a tree')
+
+                if not os.path.isdir(sub_block_path):
+                    os.mkdir(sub_block_path)
+
+        with open(data_path, 'wb') as f:
+            item = self._item.encode(value)
+            f.write(item)
+
     def add(self, key: str, value: Union[str, int, float, bool]) -> None:
         """Add a item to database.
 
@@ -95,12 +118,17 @@ class MelkDB:
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
-        block_path = self._block.make_path(key)
-        data_path = os.path.join(block_path, key)
-        item = self._item.encode(value)
+        key_parts = [p for p in key.split('/') if p]
 
-        with open(data_path, 'wb') as f:
-            f.write(item)
+        if len(key_parts) > 1:
+            self._add_tree(key_parts, value)
+        else:
+            block_path = self._block.make_path(key)
+            data_path = os.path.join(block_path, key)
+            item = self._item.encode(value)
+
+            with open(data_path, 'wb') as f:
+                f.write(item)
 
     def get(self, key: str) -> Union[None, str, int, float, bool]:
         """Get a item from database
@@ -119,14 +147,21 @@ class MelkDB:
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
-        key_path = self._block.get_path(key)
-        data_file_path = os.path.join(key_path, key)
+        key_parts = [p for p in key.split('/') if p]
+
+        if len(key_parts) > 1:
+            data_file_path = self._block.get_tree_path(key_parts)
+        else:
+            key_path = self._block.get_path(key)
+            data_file_path = os.path.join(key_path, key)
 
         if os.path.isfile(data_file_path):
             with open(data_file_path, 'rb') as f:
                 value = self._item.decode(f)
 
             return value
+        elif os.path.isdir(data_file_path):
+            raise KeyIsATreeError(f'you can\'t get the full {repr(key)} tree')
 
     def delete(self, key: str) -> None:
         """Delete a item from database
@@ -147,11 +182,18 @@ class MelkDB:
         if not utils.key_is_valid(key):
             raise InvalidCharInKeyError(f'Key {repr(key)} is not valid')
 
-        key_path = self._block.get_path(key)
-        data_file_path = os.path.join(key_path, key)
+        key_parts = [p for p in key.split('/') if p]
+
+        if len(key_parts) > 1:
+            data_file_path = self._block.get_tree_path(key_parts)
+        else:
+            key_path = self._block.get_path(key)
+            data_file_path = os.path.join(key_path, key)
 
         if os.path.isfile(data_file_path):
             os.remove(data_file_path)
+        elif os.path.isdir(data_file_path):
+            shutil.rmtree(data_file_path, ignore_errors=True)
         else:
             raise ItemNotExistsError(f'Item {repr(key)} not exists')
 

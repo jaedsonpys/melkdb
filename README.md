@@ -1,6 +1,6 @@
 # **MelkDB**: Um banco de dados veloz e otimizado
 
-MelkDB é um banco de dados modelo key-value desenvolvido totalmente em Python. Com seu funcionamento bem documentado, O MelkDB é fácil de usar e pode ser instalado facilmente em sistemas operacionais baseados em Linux e no Windows.
+MelkDB é um banco de dados baseado em diretório desenvolvido totalmente em Python. Com seu funcionamento bem documentado, O MelkDB é fácil de usar e pode ser instalado facilmente em sistemas operacionais baseados em Linux e no Windows.
 
 1. **Obtenha os dados rapidamente**: Desenvolvido para ser extremamente veloz na escrita e leitura de dados, o MelkDB possui um método eficiente para realizar a busca de items, além de ter um código bem otimizado.
 2. **Mantenha seus dados seguros**: O MelkDB oferece a opção de criptografia de dados usando AES-256, protegendo seus dados e mantendo a velocidade ao adicionar e obter items.
@@ -30,19 +30,11 @@ Finalizando a instalação, o banco de dados MelkDB já está pronto para ser ut
 ```python
 from melkdb import MelkDB
 
-db = MelkDB('cache')
+db = MelkDB('users')
 
-# adicionando um item
-db.add("latest_news", "Conteúdo das últimas notícias")
-
-# atualizando um item
-db.update("latest_news", "MelkDB é lançado oficialmente")
-
-# obtendo um item
-print(db.get("latest_news"))
-
-# deletando um item
-db.delete("latest_news")
+db.add('users/melk/name', 'Melk')
+db.add('users/melk/age', 18)
+db.add('users/melk/isTheBestCat', True)
 ```
 
 Veja a [documentação completa](https://github.com/jaedsonpys/melkdb/tree/master/docs) para aprender mais sobre o funcionamento e métodos disponíveis para uso do MelkDB.

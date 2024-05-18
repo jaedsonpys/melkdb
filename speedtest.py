@@ -7,7 +7,7 @@ from time import time
 DATA_NUM = 10_000
 
 # If key is available, all test data will be encrypted
-db = MelkDB('speedtest', key='speedtest-secret-key')
+db = MelkDB('speedtest', encrypt_key='speedtest-secret-key')
 
 data = list()
 fake = Faker()
